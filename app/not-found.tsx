@@ -16,20 +16,7 @@ export default function NotFound() {
       <div className="fixed top-0 left-0 right-0 supports-backdrop-blur:bg-background/60  bg-background/95 backdrop-blur  z-50  ">
         <nav className="h-14 flex items-center justify-between px-4 max-w-[1540px] mx-auto">
           <div className=" flex items-center gap-4">
-            <Link href="/">
-              <Image
-                src={
-                  resolvedTheme === "dark"
-                    ? "/images/xcrow_logo_dark.png"
-                    : "/images/xcrow_logo_light.png"
-                }
-                width={100}
-                height={100}
-                alt="light"
-                className="w-12 h-8 "
-              />
-            </Link>
-            <h2 className="text-4xl font-bold tracking-tight ">xcrow</h2>
+            <h2 className="text-4xl font-bold tracking-tight ">MCQs</h2>
           </div>
         </nav>
       </div>
