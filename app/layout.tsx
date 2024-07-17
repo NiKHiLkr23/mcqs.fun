@@ -9,6 +9,7 @@ import ThemeProvider from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import QueryProvider from "@/components/providers/query-provider";
 import { LoadingModal } from "@/components/modal/loading-modal";
+import { siteConfig } from "@/config/site";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -16,10 +17,13 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "Next.js PXCI starter",
-  description: "Your next app powered by Prisma, Xata, Clerk, and Inngest.",
+  metadataBase: new URL(`https://mcqs.fun`),
+  title: {
+    default: siteConfig.name,
+    template: `${siteConfig.name} | %s`,
+  },
+  description: siteConfig.description,
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

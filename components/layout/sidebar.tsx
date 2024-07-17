@@ -13,7 +13,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { user } = useUser();
 
-  if (!user && pathname === "/") return null;
+  if (!user || pathname === "/") return null;
 
   return (
     <nav
