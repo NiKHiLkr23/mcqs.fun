@@ -15,10 +15,11 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Loader } from "lucide-react";
+import { MobileSidebar } from "./sidebar-mobile";
 function Header() {
   const pathname = usePathname();
   return (
-    <div className="fixed top-0 left-0 right-0 supports-backdrop-blur:bg-background/60  bg-background/95 backdrop-blur  z-50 bg-white text-black ">
+    <div className="fixed top-0 left-0 right-0 supports-backdrop-blur:bg-background/60  bg-background/95 backdrop-blur shadow-sm z-50 bg-white text-black ">
       <nav className="h-14 flex items-center justify-between px-4 max-w-[1540px] mx-auto">
         <div className=" flex items-center lg:gap-4">
           <Link href="/" className=" flex items-center lg:gap-4">
@@ -42,6 +43,9 @@ function Header() {
               </SignInButton>
             </SignedOut>
           </ClerkLoaded>
+          <div className={cn("block lg:!hidden")}>
+            <MobileSidebar />
+          </div>
         </div>
       </nav>
     </div>

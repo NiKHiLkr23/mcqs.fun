@@ -3,56 +3,86 @@ import OpenAI from "openai";
 
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-// Functions exported from this file are exposed to Inngest
-// See: @/app/api/inngest/route.ts
+export const generateMCQ = inngest.createFunction(
+  { id: "generate-mcq" }, // Each function should have a unique ID
+  { event: "app/generate-mcq" }, // When an event by this name received, this function will run
 
-// export const messageSent = inngest.createFunction(
-//   { id: "message-sent" }, // Each function should have a unique ID
-//   { event: "app/message.sent" }, // When an event by this name received, this function will run
+  async ({ event, step, prisma }) => {
+    const systemPrompt =
+      "You are a helpful AI that is able to generate content/article for a topic and mcq questions and answers based on the generated content/article. The length of each answer should not be more than 15 words, store all answers and questions and options in a JSON array";
+    const output_format = {
+      topic: "{topic}",
+      content: "Article content here",
+      questions: [
+        {
+          question: "question",
+          answer: "answer with max length of 15 words",
+          option1: "option1 with max length of 15 words",
+          option2: "option2 with max length of 15 words",
+          option3: "option3 with max length of 15 words",
+        },
+      ],
+    };
+    const output_format_prompt: string = `\nYou are to output the following in json format: ${JSON.stringify(
+      output_format
+    )}. \nDo not put quotation marks or escape character \\ in the output fields.`;
 
-//   async ({ event, step, prisma }) => {
-//     // Fetch data from the database
-//     const message = await prisma.messages.findUnique({
-//       where: {
-//         xata_id: event.data.messageId,
-//       },
-//     });
+    const userPrompt = event.data.prompt;
 
-//     if (!message) {
-//       return;
-//     }
+    const generatedMCQ = await step.run("generate-mcq", async () => {
+      if (!OPENAI_API_KEY) {
+        console.log("No open api key");
+        return { data: null };
+      }
+      try {
+        const openai = new OpenAI();
+        const completion = await openai.chat.completions.create({
+          messages: [
+            {
+              role: "system",
+              content: systemPrompt + output_format_prompt,
+            },
+            { role: "user", content: userPrompt.toString() },
+          ],
+          model: "gpt-3.5-turbo",
+        });
 
-//     // You can execute code that interacts with external services
-//     // All code is retried automatically on failure
-//     // Read more about Inngest steps: https://www.inngest.com/docs/learn/inngest-steps
-//     const reply = await step.run("create-reply", async () => {
-//       if (OPENAI_API_KEY) {
-//         const openai = new OpenAI();
-//         const completion = await openai.chat.completions.create({
-//           messages: [
-//             {
-//               role: "system",
-//               content:
-//                 "You are a helpful assistant. Create a funny reply to my message:",
-//             },
-//             { role: "user", content: message?.text },
-//           ],
-//           model: "gpt-3.5-turbo",
-//         });
-//         return (
-//           completion.choices[0]?.message.content ?? "Unexpected OpenAI response"
-//         );
-//       } else {
-//         return "Add OPENAI_API_KEY environment variable to get AI responses.";
-//       }
-//     });
+        let res: string =
+          completion.choices[0].message?.content?.replace(/'/g, '"') ??
+          "Unexpected OpenAI response";
 
-//     const newMessage = await step.run("add-reply-to-message", async () => {
-//       return await prisma.messages.create({
-//         data: { text: reply, author: "AI" },
-//       });
-//     });
+        res = res.replace(/(\w)"(\w)/g, "$1'$2");
 
-//     return { event, body: `Here's your last message: ${newMessage?.text}!` };
-//   }
-// );
+        return { data: JSON.parse(res) };
+      } catch (error) {
+        return { data: null };
+      }
+    });
+
+    if (!generatedMCQ.data) {
+      return;
+    }
+
+    const updateMCQ = await step.run("update-mcq-data", async () => {
+      return await prisma.mCQ.update({
+        where: { id: event.data.mcqId as string },
+        data: {
+          content: generatedMCQ.data.content,
+          isCreated: true,
+          questions: {
+            create: generatedMCQ.data.questions.map((q: any) => ({
+              question: q.question,
+              OptionA: q.option1,
+              OptionB: q.option2,
+              OptionC: q.option3,
+              OptionD: q.answer,
+              correctOption: q.answer,
+            })),
+          },
+        },
+      });
+    });
+
+    return { event, body: updateMCQ };
+  }
+);

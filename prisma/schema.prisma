@@ -18,15 +18,116 @@ datasource db {
 }
 
 model User {
-  clerkUserId    String   @unique
+  clerkUserId    String    @unique
   firstName      String?
   lastName       String?
   imageUrl       String?
-  email          String   @unique
-  oauthProvider  String
+  email          String    @unique
+  mcqs           MCQ[]
+  comments       Comment[]
+  likes          Like[]
+  // xata fields
+  xata_updatedat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_id        String    @unique(map: "_pgroll_users_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+  Attempt        Attempt[]
+}
+
+model MCQ {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  title     String
+  authorId  String
+  isCreated Boolean
+  content   String? // Content for reading and understanding the topic
+
+  // user scores
+  timeStarted    DateTime?
+  timeEnded      DateTime?
+  // xata fields
+  xata_updatedat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_id        String    @unique(map: "_pgroll_mcqs_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+
+  author    User       @relation(fields: [authorId], references: [clerkUserId])
+  questions Question[]
+  comments  Comment[]
+  likes     Like[]
+  Attempt   Attempt[]
+}
+
+model Attempt {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  userId    String
+  mcqId     String
+  mcq       MCQ      @relation(fields: [mcqId], references: [id])
+
+  // user scores
+  timeStarted    DateTime?
+  timeEnded      DateTime?
+  // xata fields
+  xata_updatedat DateTime  @default(now()) @db.Timestamptz(6)
+  xata_id        String    @unique(map: "_pgroll_attempts_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int       @default(0)
+  xata_createdat DateTime  @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [clerkUserId])
+}
+
+model Question {
+  id            String   @id @default(uuid())
+  createdAt     DateTime @default(now())
+  mcqId         String
+  mcq           MCQ      @relation(fields: [mcqId], references: [id])
+  question      String
+  OptionA       String
+  OptionB       String
+  OptionC       String
+  OptionD       String
+  correctOption String
+
+  // User scores
+  isCorrect     Boolean?
+  choosenOption String?
+
   // xata fields
   xata_updatedat DateTime @default(now()) @db.Timestamptz(6)
-  xata_id        String   @unique(map: "_pgroll_users_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_id        String   @unique(map: "_pgroll_questions_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int      @default(0)
+  xata_createdat DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model Comment {
+  id             String   @id @default(uuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  content        String
+  authorId       String
+  // xata fields
+  xata_updatedat DateTime @default(now()) @db.Timestamptz(6)
+  xata_id        String   @unique(map: "_pgroll_comments_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
+  xata_version   Int      @default(0)
+  xata_createdat DateTime @default(now()) @db.Timestamptz(6)
+
+  author User   @relation(fields: [authorId], references: [clerkUserId])
+  mcqId  String
+  mcq    MCQ    @relation(fields: [mcqId], references: [id])
+}
+
+model Like {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [clerkUserId])
+  mcqId     String
+  mcq       MCQ      @relation(fields: [mcqId], references: [id])
+
+  // xata fields
+  xata_updatedat DateTime @default(now()) @db.Timestamptz(6)
+  xata_id        String   @unique(map: "_pgroll_likes_xata_id_key") @default(dbgenerated("('rec_'::text || (xata_private.xid())::text)"))
   xata_version   Int      @default(0)
   xata_createdat DateTime @default(now()) @db.Timestamptz(6)
 }

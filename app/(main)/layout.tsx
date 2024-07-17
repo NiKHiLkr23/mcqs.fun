@@ -1,8 +1,5 @@
 import Header from "@/components/layout/header";
-import { LoadingModal } from "@/components/modal/loading-modal";
-import { ClerkProvider } from "@/components/providers/clerk-provider";
-import { ModalProvider } from "@/components/providers/modal-provider";
-import QueryProvider from "@/components/providers/query-provider";
+import Sidebar from "@/components/layout/sidebar";
 
 export default async function MainLayout({
   children,
@@ -10,19 +7,13 @@ export default async function MainLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ClerkProvider>
-      <QueryProvider>
-        <ModalProvider />
+    <main className=" w-full lg:max-w-6xl xl:max-w-[1540px] lg:mx-auto ">
+      <Header />
 
-        <main className=" ">
-          <Header />
-
-          <div className="flex flex-col  min-h-screen w-full   ">
-            {children}
-            <LoadingModal />
-          </div>
-        </main>
-      </QueryProvider>
-    </ClerkProvider>
+      <div className="flex h-screen">
+        <Sidebar />
+        <div className="w-full overflow-hidden ">{children}</div>
+      </div>
+    </main>
   );
 }

@@ -44,6 +44,7 @@
     "@tanstack/react-query-devtools": "^5.51.1",
     "@xata.io/cli": "^0.15.15",
     "@xata.io/client": "^0.29.5",
+    "axios": "^1.7.2",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "cmdk": "^1.0.0",

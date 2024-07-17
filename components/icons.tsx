@@ -7,6 +7,7 @@ import {
   ChevronLeft,
   ChevronRight,
   CircuitBoardIcon,
+  ClipboardList,
   Command,
   CreditCard,
   File,
@@ -40,13 +41,13 @@ import {
 export type Icon = LucideIcon;
 
 export const Icons = {
-  dashboard: LayoutDashboardIcon,
+  explore: LayoutDashboardIcon,
+  leaderBoard: ClipboardList,
   logo: Command,
   login: LogIn,
   close: X,
   profile: User2Icon,
   spinner: Loader2,
-  escrow: CircuitBoardIcon,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
   trash: Trash,

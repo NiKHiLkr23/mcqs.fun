@@ -1,5 +1,5 @@
-// import { messageSent } from "./functions";
+import { generateMCQ } from "./functions";
 
-// export const functions = [messageSent];
+export const functions = [generateMCQ];
 
-// export { inngest } from "./client";
+export { inngest } from "./client";

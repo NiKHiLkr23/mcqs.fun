@@ -7,6 +7,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import ThemeProvider from "@/components/providers/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import QueryProvider from "@/components/providers/query-provider";
+import { LoadingModal } from "@/components/modal/loading-modal";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -24,23 +26,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}
-      >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          enableSystem={true}
-          disableTransitionOnChange
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body
+          className={cn(
+            "min-h-screen bg-background font-sans antialiased",
+            fontSans.variable
+          )}
         >
-          <Toaster position="top-right" richColors />
-          {children}
-        </ThemeProvider>
-      </body>
-    </html>
+          <QueryProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem={true}
+              disableTransitionOnChange
+            >
+              <Toaster position="top-right" richColors />
+              {children}
+              <LoadingModal />
+            </ThemeProvider>
+          </QueryProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
