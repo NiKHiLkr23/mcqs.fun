@@ -43,6 +43,7 @@ const CreateMcqForm = ({ topic: topicParam }: Props) => {
   const { mutate: createMCQ, isPending } = useMutation({
     mutationFn: async ({ topic }: Input) => {
       const response = await generateMCQ(topic);
+      return response;
     },
   });
 
@@ -59,15 +60,14 @@ const CreateMcqForm = ({ topic: topicParam }: Props) => {
       onSuccess: () => {
         setFinishedLoading(true);
         setShowLoader(false);
+        form.reset({
+          topic: "",
+        });
         router.refresh();
       },
     });
   };
   form.watch();
-
-  if (showLoader) {
-    return <FormLoading finished={finishedLoading} />;
-  }
 
   return (
     <div className="max-w-2xl">

@@ -1,3 +1,4 @@
+import { Question } from "@prisma/client";
 import { inngest } from "./client";
 import OpenAI from "openai";
 
@@ -63,6 +64,21 @@ export const generateMCQ = inngest.createFunction(
       return;
     }
 
+    const manyData = generatedMCQ.data.questions.map((q: any) => {
+      // mix up the options lol
+      const options = [q.option1, q.option2, q.option3, q.answer].sort(
+        () => Math.random() - 0.5
+      );
+      return {
+        question: q.question,
+        OptionA: options[0],
+        OptionB: options[1],
+        OptionC: options[2],
+        OptionD: options[3],
+        correctOption: q.answer,
+      };
+    });
+
     const updateMCQ = await step.run("update-mcq-data", async () => {
       return await prisma.mCQ.update({
         where: { id: event.data.mcqId as string },
@@ -70,14 +86,7 @@ export const generateMCQ = inngest.createFunction(
           content: generatedMCQ.data.content,
           isCreated: true,
           questions: {
-            create: generatedMCQ.data.questions.map((q: any) => ({
-              question: q.question,
-              OptionA: q.option1,
-              OptionB: q.option2,
-              OptionC: q.option3,
-              OptionD: q.answer,
-              correctOption: q.answer,
-            })),
+            create: manyData,
           },
         },
       });

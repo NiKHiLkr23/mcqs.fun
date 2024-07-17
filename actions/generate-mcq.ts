@@ -29,7 +29,7 @@ export async function generateMCQ(topic: string) {
     },
   });
 
-revalidatePath("/explore")
+  revalidatePath("/explore");
 
   return response;
 }
